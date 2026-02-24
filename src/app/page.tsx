@@ -12,7 +12,6 @@ export default function Home() {
   return (
     <>
       <Header />
-
       <main id="main-content">
         {/* Hero Section */}
         <Section
@@ -28,7 +27,7 @@ export default function Home() {
           >
             <source src="/banner-video.mp4" type="video/mp4" />
           </video>
-          <div className="relative z-10 text-center max-w-4xl mx-auto bg-background/70 backdrop-blur-sm rounded-2xl p-8 lg:p-12">
+          <div className="relative z-10 text-center max-w-4xl mx-auto mt-12 bg-background/70 backdrop-blur-sm rounded-2xl p-8 lg:p-12">
             <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
               Honesty, Integrity, and Success
               <span className="text-primary block">Nakagiri Real Estate</span>
@@ -108,8 +107,8 @@ export default function Home() {
             </div>
             <div className="relative aspect-video">
               <Image
-                src="/res-tivoli-front.jpg"
-                alt="Residential property front yard in Los Angeles on Tivoli Avenue"
+                src="/res-curtis-front.jpg"
+                alt="Residential property front yard in Los Angeles on Curtis Avenue"
                 width={800}
                 height={800}
                 sizes="(max-width: 1024px) 100vw, 50vw"
