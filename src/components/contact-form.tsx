@@ -84,8 +84,8 @@ export function ContactForm() {
           Get In Touch
         </h2>
         <p className="text-muted-foreground">
-          Ready to transform your look? Contact us to book your appointment or
-          ask any questions.
+          Ready to sell, renovate, or find your next home? Fill out the form
+          below and we&apos;ll get back to you as soon as possible.
         </p>
       </div>
 
