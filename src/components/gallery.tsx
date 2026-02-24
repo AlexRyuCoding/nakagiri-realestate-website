@@ -1,21 +1,120 @@
 "use client";
 
 import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 const galleryImages = [
   { src: "/res-albright-front.jpg", alt: "Albright property front" },
-  { src: "/res-burkshire-back.jpg", alt: "Burkshire property back" },
-  { src: "/res-burkshire-family.jpg", alt: "Burkshire property family room" },
   { src: "/res-burkshire-front.jpg", alt: "Burkshire property front" },
-  { src: "/res-burkshire-living.jpg", alt: "Burkshire property living room" },
-  { src: "/res-lagrange-back.jpg", alt: "LaGrange property back" },
-  { src: "/res-lagrange-family.jpg", alt: "LaGrange property family room" },
-  { src: "/res-lagrange-front.jpg", alt: "LaGrange property front" },
-  { src: "/res-lagrange-living.jpg", alt: "LaGrange property living room" },
+  { src: "/res-curtis-front.jpg", alt: "Curtis property front" },
+  { src: "/res-greene-front.jpg", alt: "Greene property front" },
+  { src: "/res-hammack-front.jpg", alt: "Hammack property front" },
   { src: "/res-lemarsh-front.jpg", alt: "LeMarsh property front" },
+  { src: "/res-purdue-backyard.jpg", alt: "Purdue property backyard" },
+  { src: "/res-purdue-front.jpg", alt: "Purdue property front" },
+  { src: "/res-purdue-frontyard.jpg", alt: "Purdue property front yard" },
+  { src: "/res-purdue-living.jpg", alt: "Purdue property living room" },
   { src: "/res-tivoli-front.jpg", alt: "Tivoli property front" },
 ];
+
+const MAX_W = 0.9;
+const MAX_H = 0.9;
+const MOBILE_BREAKPOINT_PX = 640;
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT_PX}px)`);
+    const update = () => setIsMobile(mql.matches);
+    update();
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
+  }, []);
+  return isMobile;
+}
+
+function GalleryImageDialog({
+  image,
+  children,
+}: {
+  image: (typeof galleryImages)[0];
+  children: React.ReactNode;
+}) {
+  const isMobile = useIsMobile();
+  const [dimensions, setDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+
+  const onImageLoad = useCallback(
+    (e: React.SyntheticEvent<HTMLImageElement>) => {
+      const img = e.target as HTMLImageElement;
+      const nw = img.naturalWidth;
+      const nh = img.naturalHeight;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const scale = Math.min((vw * MAX_W) / nw, (vh * MAX_H) / nh, 1);
+      setDimensions({
+        width: Math.round(nw * scale),
+        height: Math.round(nh * scale),
+      });
+    },
+    []
+  );
+
+  const onOpenChange = useCallback((open: boolean) => {
+    if (!open) setDimensions(null);
+  }, []);
+
+  const style: React.CSSProperties = dimensions
+    ? {
+        width: dimensions.width,
+        height: dimensions.height,
+        maxWidth: "none",
+        padding: 0,
+        margin: 0,
+      }
+    : {
+        width: isMobile ? "min(90vw, 1200px)" : "min(90vw, 600px)",
+        height: isMobile ? 1200 : 600,
+        maxWidth: "none",
+        padding: 0,
+        margin: 0,
+      };
+
+  return (
+    <Dialog onOpenChange={onOpenChange}>
+      {children}
+      <DialogContent
+        className="max-w-none p-0 m-0 overflow-hidden"
+        style={style}
+      >
+        <div
+          className="relative bg-background"
+          style={
+            dimensions
+              ? { width: dimensions.width, height: dimensions.height }
+              : {
+                  width: isMobile ? "min(90vw, 1200px)" : "min(90vw, 600px)",
+                  minHeight: isMobile ? 1200 : 600,
+                }
+          }
+        >
+          <Image
+            src={image.src}
+            alt={image.alt}
+            fill
+            sizes="(max-width: 1060px) 90vw, 80vw"
+            className="object-contain"
+            priority
+            onLoad={onImageLoad}
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export function Gallery() {
   return (
@@ -30,7 +129,7 @@ export function Gallery() {
 
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
         {galleryImages.map((image, index) => (
-          <Dialog key={index}>
+          <GalleryImageDialog key={index} image={image}>
             <DialogTrigger asChild>
               <div className="group relative aspect-square overflow-hidden rounded-lg cursor-pointer focus-visible">
                 <Image
@@ -44,19 +143,7 @@ export function Gallery() {
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
               </div>
             </DialogTrigger>
-            <DialogContent className="max-w-none w-screen h-screen p-0 m-0">
-              <div className="relative w-full h-full">
-                <Image
-                  src={image.src}
-                  alt={image.alt}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 80vw"
-                  className="object-contain"
-                  priority
-                />
-              </div>
-            </DialogContent>
-          </Dialog>
+          </GalleryImageDialog>
         ))}
       </div>
     </div>
